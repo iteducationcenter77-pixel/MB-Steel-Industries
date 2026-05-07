@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login — Maa Baba Steel Industries</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body data-page="login">
+
+<div class="login-page">
+  <div class="login-box">
+
+    <div class="login-icon">🔐</div>
+    <h2 class="login-title">Admin Access</h2>
+    <p class="login-sub">Maa Baba Steel Industries</p>
+
+    <div class="ig">
+      <label>Password</label>
+      <div class="pwd-wrap">
+        <input type="password" id="pwdInput" placeholder="Enter admin password" autocomplete="current-password">
+        <button class="pwd-toggle" id="togglePwd" type="button">👁️</button>
+      </div>
+    </div>
+
+    <p class="login-err" id="loginErr"></p>
+
+    <button class="btn-primary btn-full" id="loginBtn">Login →</button>
+    <button class="btn-back" onclick="window.location.href='../index.html'">← Back to Website</button>
+
+    <p class="login-note">🔒 Secured with SHA-256 encryption. Password is never stored in plain text.</p>
+  </div>
+</div>
+
+<script src="../js/db.js"></script>
+<script src="../js/admin.js"></script>
+</body>
+</html>

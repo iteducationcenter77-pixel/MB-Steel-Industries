@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel — Maa Baba Steel Industries</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body data-page="admin">
+
+<!-- ═══════════════════════════════════════════════════════════
+     ADMIN NAVBAR
+════════════════════════════════════════════════════════════ -->
+<nav class="admin-nav">
+  <div style="display:flex;align-items:center">
+    <span class="admin-nav-title">Admin Panel</span>
+    <span class="admin-nav-badge">Maa Baba Steel Industries</span>
+  </div>
+  <div class="admin-nav-right">
+    <span class="secure-badge">🔒 Secure Session</span>
+    <button class="btn-logout" id="logoutBtn">Logout</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TABS
+════════════════════════════════════════════════════════════ -->
+<div class="admin-tabs">
+  <button class="atab active" data-tab="products">📦 Products</button>
+  <button class="atab"        data-tab="heroes">🖼️ Hero Slides</button>
+  <button class="atab"        data-tab="settings">⚙️ Settings</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TAB PANES
+════════════════════════════════════════════════════════════ -->
+<div class="admin-body">
+  <div id="pane-products" class="tab-pane"></div>
+  <div id="pane-heroes"   class="tab-pane"></div>
+  <div id="pane-settings" class="tab-pane"></div>
+</div>
+
+<!-- Scripts -->
+<script src="../js/db.js"></script>
+<script src="../js/admin.js"></script>
+</body>
+</html>

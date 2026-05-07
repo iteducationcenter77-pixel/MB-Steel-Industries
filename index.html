@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maa Baba Steel Industries — Premium Furniture</title>
+  <meta name="description" content="Wholesale & Retail manufacturer of premium wooden and steel furniture. ISO 9001:2015 Certified. Based in Howly, Barpeta, Assam.">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- WhatsApp SVG icon shorthand -->
+  <style>
+    .wa-icon { width:17px; height:17px; display:inline-block; vertical-align:middle; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     NAVBAR
+════════════════════════════════════════════════════════════ -->
+<nav class="navbar" id="navbar">
+  <div class="nav-brand">
+    <div class="nav-brand-name" id="storeName1">Maa Baba Steel Industries</div>
+    <div class="nav-brand-sub">ISO 9001:2015 Certified</div>
+  </div>
+  <div class="nav-links">
+    <a href="#products" class="nav-text-link">Products</a>
+    <a href="#contact"  class="nav-text-link">Contact</a>
+    <a href="#" class="nav-wa" id="navWa" target="_blank" rel="noopener noreferrer">
+      <svg class="wa-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      WhatsApp Us
+    </a>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HERO SECTION
+════════════════════════════════════════════════════════════ -->
+<section class="hero">
+  <div id="heroSlides"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-badge">Wholesale &amp; Retail — ISO 9001:2015 Certified</div>
+    <h1 class="hero-title" id="storeName2">Maa Baba Steel Industries</h1>
+    <p class="hero-sub" id="tagline1">Premium Wooden &amp; Steel Furniture</p>
+    <div class="hero-btns">
+      <a href="#products" class="btn-hero-p">Browse Collection</a>
+      <a href="#contact"  class="btn-hero-g">Contact Us</a>
+    </div>
+  </div>
+  <div class="hero-dots" id="heroDots"></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TRUST BAR
+════════════════════════════════════════════════════════════ -->
+<div class="trust-bar">
+  <span class="trust-item">✦ ISO 9001:2015 Certified</span>
+  <span class="trust-item">✦ Factory Direct Prices</span>
+  <span class="trust-item">✦ Wholesale &amp; Retail</span>
+  <span class="trust-item">✦ Premium Quality Guaranteed</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PRODUCTS SECTION
+════════════════════════════════════════════════════════════ -->
+<section class="section" id="products">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-eyebrow">Our Collection</div>
+      <h2 class="section-title">Explore Premium Furniture</h2>
+      <div class="gold-line"></div>
+      <p class="section-desc">Handcrafted with precision — Available for wholesale &amp; retail</p>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <button class="filter-btn active" data-cat="all">🪑 All Products</button>
+      <button class="filter-btn" data-cat="wooden">🪵 Wooden Furniture</button>
+      <button class="filter-btn" data-cat="steel">🔩 Steel Furniture</button>
+      <span class="filter-count" id="productCount"></span>
+    </div>
+
+    <!-- Grid -->
+    <div class="product-grid" id="productGrid">
+      <div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#999;font-family:'Outfit',sans-serif">Loading products...</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     WHOLESALE SECTION
+════════════════════════════════════════════════════════════ -->
+<section class="wholesale-section">
+  <div class="wholesale-inner">
+    <div class="wholesale-eyebrow">Wholesale Enquiry</div>
+    <h2 class="wholesale-title">Bulk Orders &amp; Institutional Supply</h2>
+    <p class="wholesale-desc">
+      Special wholesale pricing available for dealers, contractors, institutions and bulk buyers.
+      Contact us directly for custom orders and special requirements.
+    </p>
+    <a href="#" class="btn-wholesale" id="wholesaleWa" target="_blank" rel="noopener noreferrer">
+      <svg class="wa-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Enquire on WhatsApp
+    </a>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════════════════ -->
+<footer class="footer" id="contact">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand-name" id="storeName3">Maa Baba Steel Industries</div>
+        <p class="footer-brand-desc">
+          Premium Wooden &amp; Steel Furniture<br>
+          ISO 9001:2015 Certified<br>
+          Manufacturer &amp; Wholesale Supplier
+        </p>
+      </div>
+      <div>
+        <div class="footer-col-title">Contact Us</div>
+        <div class="footer-contact-line">
+          <div>📍 <span id="address1"></span></div>
+          <div>📞 <a href="#" id="telLink"><span id="phone1"></span></a></div>
+          <div>✉️ <a href="#" id="mailLink"><span id="email1"></span></a></div>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Our Products</div>
+        <a href="#products" class="footer-link">Wooden Furniture</a>
+        <a href="#products" class="footer-link">Steel Furniture</a>
+        <a href="#contact"  class="footer-link">Wholesale Enquiry</a>
+        <a href="admin/login.html" class="footer-link" style="opacity:0.4;font-size:11px;margin-top:16px">Admin Panel</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© <span id="year"></span> Maa Baba Steel Industries. All rights reserved.</p>
+      <button class="admin-link" id="adminBtn">Admin</button>
+    </div>
+  </div>
+</footer>
+
+<!-- Scripts -->
+<script src="js/db.js"></script>
+<script src="js/main.js"></script>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
