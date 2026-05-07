@@ -1,19 +1,144 @@
-// ── db.js — localStorage-based database ──────────────────────
+// Shared data layer. Uses Vercel /api/store when configured, with localStorage as fallback.
+const DB_PREFIX = 'mbs_';
+
 const DB = {
-  set(key, value) {
-    try { localStorage.setItem('mbs_' + key, JSON.stringify(value)); return true; }
-    catch(e) { console.error('DB set error', e); return false; }
-  },
-  get(key, fallback = null) {
+  data: {},
+  remote: false,
+
+  async init() {
     try {
-      const v = localStorage.getItem('mbs_' + key);
-      return v !== null ? JSON.parse(v) : fallback;
-    } catch(e) { return fallback; }
+      const res = await fetch('/api/store', { cache: 'no-store' });
+      if (res.ok) {
+        const payload = await res.json();
+        if (payload && payload.configured) {
+          this.data = payload.data || {};
+          this.remote = true;
+          this.cacheAll();
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('Remote DB unavailable, using local fallback.', e);
+    }
+
+    this.remote = false;
+    this.data = {
+      products: readLocal('products', SEED_PRODUCTS),
+      heroes: readLocal('heroes', SEED_HEROES),
+      settings: readLocal('settings', SEED_SETTINGS),
+      pwdHash: readLocal('pwdHash', await sha256('Admin@MaaBaba123'))
+    };
+    this.cacheAll();
   },
-  remove(key) { localStorage.removeItem('mbs_' + key); }
+
+  get(key, fallback = null) {
+    return Object.prototype.hasOwnProperty.call(this.data, key) ? this.data[key] : fallback;
+  },
+
+  async set(key, value) {
+    this.data[key] = value;
+    writeLocal(key, value);
+
+    if (!this.remote) {
+      if (isHostedSite()) throw new Error('Shared storage is not configured.');
+      return true;
+    }
+
+    const res = await fetch('/api/store', {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ action: 'save', key, value })
+    });
+
+    if (!res.ok) throw new Error(await responseMessage(res));
+    return true;
+  },
+
+  async login(passwordHash) {
+    if (!this.remote) {
+      return passwordHash === this.get('pwdHash', '');
+    }
+
+    const res = await fetch('/api/store', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'login', passwordHash })
+    });
+
+    if (!res.ok) return false;
+    const payload = await res.json();
+    if (payload.token) sessionStorage.setItem('mbs_token', payload.token);
+    return true;
+  },
+
+  async changePassword(oldHash, newHash) {
+    if (!this.remote) {
+      if (oldHash !== this.get('pwdHash', '')) return false;
+      await this.set('pwdHash', newHash);
+      return true;
+    }
+
+    const res = await fetch('/api/store', {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ action: 'changePassword', oldHash, newHash })
+    });
+
+    if (!res.ok) return false;
+    this.data.pwdHash = newHash;
+    writeLocal('pwdHash', newHash);
+    return true;
+  },
+
+  cacheAll() {
+    Object.keys(this.data).forEach(key => writeLocal(key, this.data[key]));
+  },
+
+  remove(key) {
+    delete this.data[key];
+    localStorage.removeItem(DB_PREFIX + key);
+  }
 };
 
-// ── Seed data ─────────────────────────────────────────────────
+function authHeaders() {
+  const headers = { 'Content-Type': 'application/json' };
+  const token = sessionStorage.getItem('mbs_token');
+  if (token) headers.Authorization = 'Bearer ' + token;
+  return headers;
+}
+
+async function responseMessage(res) {
+  try {
+    const payload = await res.json();
+    return payload.error || res.statusText;
+  } catch (e) {
+    return res.statusText;
+  }
+}
+
+function readLocal(key, fallback = null) {
+  try {
+    const v = localStorage.getItem(DB_PREFIX + key);
+    return v !== null ? JSON.parse(v) : fallback;
+  } catch (e) {
+    return fallback;
+  }
+}
+
+function writeLocal(key, value) {
+  try {
+    localStorage.setItem(DB_PREFIX + key, JSON.stringify(value));
+  } catch (e) {
+    console.error('Local cache write error', e);
+  }
+}
+
+function isHostedSite() {
+  const host = window.location.hostname;
+  return host && host !== 'localhost' && host !== '127.0.0.1';
+}
+
+// Seed data
 const SEED_PRODUCTS = [
   { id:'p1', name:'Royal Wooden Bed Frame', cat:'wooden', color:'Mahogany', orig:35000, offer:28999, img:'', wa:'', desc:'Premium solid teak wood bed frame with fine polish finish and strong joints.' },
   { id:'p2', name:'Steel 3-Door Almirah', cat:'steel', color:'Silver Grey', orig:18000, offer:14500, img:'', wa:'', desc:'Heavy-duty steel almirah with anti-rust powder coating and secure locking system.' },
@@ -38,21 +163,15 @@ const SEED_SETTINGS = {
   email: 'maababasteels@gmail.com'
 };
 
-// ── Initialize ────────────────────────────────────────────────
 async function initDB() {
-  if (!DB.get('products')) DB.set('products', SEED_PRODUCTS);
-  if (!DB.get('heroes'))   DB.set('heroes',   SEED_HEROES);
-  if (!DB.get('settings')) DB.set('settings', SEED_SETTINGS);
-  if (!DB.get('pwdHash'))  DB.set('pwdHash', await sha256('Admin@MaaBaba123'));
+  await DB.init();
 }
 
-// ── SHA-256 helper ────────────────────────────────────────────
 async function sha256(text) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
   return [...new Uint8Array(buf)].map(x => x.toString(16).padStart(2,'0')).join('');
 }
 
-// ── Helpers ───────────────────────────────────────────────────
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 
 function discPct(orig, offer) {
@@ -62,7 +181,6 @@ function discPct(orig, offer) {
 
 function inr(n) { return '₹' + Number(n).toLocaleString('en-IN'); }
 
-// Convert Google Drive share link → direct embed URL
 function gdImg(url) {
   if (!url) return '';
   const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
@@ -70,6 +188,6 @@ function gdImg(url) {
 }
 
 function waUrl(number, message) {
-  const num = number.replace(/\D/g, '');
+  const num = String(number || '').replace(/\D/g, '');
   return `https://wa.me/${num}?text=${encodeURIComponent(message)}`;
 }

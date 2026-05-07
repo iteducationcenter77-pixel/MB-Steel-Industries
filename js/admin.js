@@ -44,8 +44,8 @@ function initLogin() {
     const btn = document.getElementById('loginBtn');
     btn.textContent = 'Verifying...'; btn.disabled = true;
     const h = await sha256(pwd);
-    const storedHash = DB.get('pwdHash', '');
-    if (h === storedHash) {
+    const ok = await DB.login(h);
+    if (ok) {
       sessionStorage.setItem('mbs_auth', '1');
       window.location.href = 'panel.html';
     } else {
@@ -240,10 +240,13 @@ function bindProdForm(container, editId) {
   });
 
   // Save
-  container.querySelector('#f-save').addEventListener('click', () => {
+  container.querySelector('#f-save').addEventListener('click', async () => {
     const name = container.querySelector('#f-name').value.trim();
     const orig = Number(container.querySelector('#f-orig').value);
     if (!name || !orig) { alert('Product name and original price are required.'); return; }
+    const saveBtn = container.querySelector('#f-save');
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving...';
     const prod = {
       id:    editId || uid(),
       name,
@@ -260,14 +263,21 @@ function bindProdForm(container, editId) {
     } else {
       products.push(prod);
     }
-    DB.set('products', products);
-    showToast(editId ? '✓ Product updated!' : '✓ Product added!');
-    // Close add form if adding
-    if (!editId) {
-      document.getElementById('addProdForm').style.display = 'none';
+    try {
+      await DB.set('products', products);
+      showToast(editId ? '✓ Product updated!' : '✓ Product added!');
+      // Close add form if adding
+      if (!editId) {
+        document.getElementById('addProdForm').style.display = 'none';
+      }
+      updateProdCount();
+      renderProdList();
+    } catch (error) {
+      alert('Could not save product. Please connect Vercel Redis storage and login again.');
+      console.error(error);
+      saveBtn.disabled = false;
+      saveBtn.textContent = editId ? 'Save Changes' : 'Add Product';
     }
-    updateProdCount();
-    renderProdList();
   });
 
   // Cancel
@@ -281,13 +291,18 @@ function bindProdForm(container, editId) {
   });
 }
 
-function deleteProd(id) {
+async function deleteProd(id) {
   if (!confirm('Delete this product? This cannot be undone.')) return;
   products = products.filter(p => p.id !== id);
-  DB.set('products', products);
-  updateProdCount();
-  renderProdList();
-  showToast('Product deleted.');
+  try {
+    await DB.set('products', products);
+    updateProdCount();
+    renderProdList();
+    showToast('Product deleted.');
+  } catch (error) {
+    alert('Could not delete product. Please connect Vercel Redis storage and login again.');
+    console.error(error);
+  }
 }
 
 // ══ HEROES TAB ════════════════════════════════════════════════
@@ -321,17 +336,28 @@ function renderHeroTab() {
     else { preview.style.display = 'none'; }
   });
 
-  document.getElementById('addHeroBtn').addEventListener('click', () => {
+  document.getElementById('addHeroBtn').addEventListener('click', async () => {
     const url = document.getElementById('newHUrl').value.trim();
     const label = document.getElementById('newHLabel').value.trim();
     if (!url) { alert('Image URL is required.'); return; }
+    const btn = document.getElementById('addHeroBtn');
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
     heroes.push({ id: uid(), url, label });
-    DB.set('heroes', heroes);
-    document.getElementById('newHUrl').value = '';
-    document.getElementById('newHLabel').value = '';
-    document.getElementById('newHPreview').style.display = 'none';
-    showToast('✓ Slide added!');
-    renderHeroList();
+    try {
+      await DB.set('heroes', heroes);
+      document.getElementById('newHUrl').value = '';
+      document.getElementById('newHLabel').value = '';
+      document.getElementById('newHPreview').style.display = 'none';
+      showToast('Slide added!');
+      renderHeroList();
+    } catch (error) {
+      alert('Could not save slide. Please connect Vercel Redis storage and login again.');
+      console.error(error);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Add Slide';
+    }
   });
 
   renderHeroList();
@@ -357,12 +383,17 @@ function renderHeroList() {
     </div>`).join('');
 }
 
-function deleteHero(id) {
+async function deleteHero(id) {
   if (!confirm('Remove this hero slide?')) return;
   heroes = heroes.filter(h => h.id !== id);
-  DB.set('heroes', heroes);
-  renderHeroList();
-  showToast('Slide removed.');
+  try {
+    await DB.set('heroes', heroes);
+    renderHeroList();
+    showToast('Slide removed.');
+  } catch (error) {
+    alert('Could not remove slide. Please connect Vercel Redis storage and login again.');
+    console.error(error);
+  }
 }
 
 // ══ SETTINGS TAB ══════════════════════════════════════════════
@@ -407,7 +438,7 @@ function renderSettingsTab() {
       </ol>
     </div>`;
 
-  document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+  document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
     settings = {
       storeName: document.getElementById('s-name').value.trim(),
       tagline:   document.getElementById('s-tag').value.trim(),
@@ -416,8 +447,19 @@ function renderSettingsTab() {
       defaultWa: document.getElementById('s-wa').value.replace(/\D/g,''),
       address:   document.getElementById('s-addr').value.trim()
     };
-    DB.set('settings', settings);
-    showToast('✓ Settings saved!');
+    const btn = document.getElementById('saveSettingsBtn');
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+    try {
+      await DB.set('settings', settings);
+      showToast('Settings saved!');
+    } catch (error) {
+      alert('Could not save settings. Please connect Vercel Redis storage and login again.');
+      console.error(error);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Save Settings';
+    }
   });
 
   document.getElementById('changePwdBtn').addEventListener('click', async () => {
@@ -432,11 +474,9 @@ function renderSettingsTab() {
     if (nw.length < 8)          { show('Password must be at least 8 characters.'); return; }
 
     const oldHash = await sha256(old);
-    const storedHash = DB.get('pwdHash', '');
-    if (oldHash !== storedHash) { show('Current password is incorrect.'); return; }
-
     const newHash = await sha256(nw);
-    DB.set('pwdHash', newHash);
+    const changed = await DB.changePassword(oldHash, newHash);
+    if (!changed) { show('Current password is incorrect or storage is not connected.'); return; }
     document.getElementById('p-old').value = '';
     document.getElementById('p-new').value = '';
     document.getElementById('p-conf').value = '';
