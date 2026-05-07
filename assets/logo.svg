@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Maa Baba Steel Industries Logo</title>
+  <desc id="desc">Gold and charcoal MB monogram with steel and wood accents.</desc>
+  <defs>
+    <linearGradient id="gold" x1="21" y1="18" x2="108" y2="113" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f1c66a"/>
+      <stop offset=".48" stop-color="#c8912a"/>
+      <stop offset="1" stop-color="#8d5f18"/>
+    </linearGradient>
+    <linearGradient id="steel" x1="25" y1="26" x2="102" y2="106" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f7fafc"/>
+      <stop offset=".5" stop-color="#aeb8c4"/>
+      <stop offset="1" stop-color="#5f6f81"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="9" flood-color="#000000" flood-opacity=".3"/>
+    </filter>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="#100c06"/>
+  <path d="M16 99h96" stroke="url(#gold)" stroke-width="5" stroke-linecap="round"/>
+  <path d="M23 24h82c6.1 0 11 4.9 11 11v58c0 6.1-4.9 11-11 11H23c-6.1 0-11-4.9-11-11V35c0-6.1 4.9-11 11-11Z" fill="none" stroke="url(#gold)" stroke-width="4"/>
+  <path d="M31 86V42h11l12 20 12-20h11v44H65V63L55 79h-3L42 63v23H31Z" fill="url(#steel)" filter="url(#shadow)"/>
+  <path d="M79 86V42h21c9 0 15 5 15 12 0 4.4-2.5 8.1-6.2 9.8 4.9 1.5 8.2 5.7 8.2 10.6 0 7.2-6.1 11.6-15.7 11.6H79Zm12-27h8.7c2.6 0 4.4-1.6 4.4-3.9 0-2.4-1.8-3.8-4.4-3.8H91V59Zm0 17.6h9.7c3 0 4.8-1.6 4.8-4.1s-1.8-4-4.8-4H91v8.1Z" fill="#f7e4b1" filter="url(#shadow)"/>
+  <path d="M25 32c9 1.5 16.8 1.4 27 0" stroke="#9a5f2b" stroke-width="3" stroke-linecap="round"/>
+  <path d="M90 30h18M96 36h12" stroke="#d7dde6" stroke-width="3" stroke-linecap="round"/>
+</svg>
