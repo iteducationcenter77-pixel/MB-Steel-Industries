@@ -36,10 +36,10 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const data = await getStore();
+    const { data, initialized } = await getStore();
 
     if (req.method === 'GET') {
-      return send(res, 200, { configured: true, data: publicData(data) });
+      return send(res, 200, { configured: true, initialized, data: publicData(data) });
     }
 
     if (req.method !== 'POST') {
@@ -91,9 +91,9 @@ async function getStore() {
   const stored = await redisCommand(['GET', STORE_KEY]);
   if (!stored) {
     await setStore(seedData);
-    return { ...seedData };
+    return { data: { ...seedData }, initialized: false };
   }
-  return JSON.parse(stored);
+  return { data: JSON.parse(stored), initialized: true };
 }
 
 async function setStore(data) {

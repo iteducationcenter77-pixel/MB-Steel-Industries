@@ -4,6 +4,7 @@ const DB_PREFIX = 'mbs_';
 const DB = {
   data: {},
   remote: false,
+  needsMigration: false,
 
   async init() {
     try {
@@ -11,7 +12,14 @@ const DB = {
       if (res.ok) {
         const payload = await res.json();
         if (payload && payload.configured) {
-          this.data = payload.data || {};
+          const remoteData = payload.data || {};
+          const localData = localPublicData();
+          if (hasLocalData(localData) && !samePublicData(localData, remoteData)) {
+            this.data = { ...remoteData, ...localData };
+            this.needsMigration = true;
+          } else {
+            this.data = remoteData;
+          }
           this.remote = true;
           this.cacheAll();
           return;
@@ -68,6 +76,7 @@ const DB = {
     if (!res.ok) return false;
     const payload = await res.json();
     if (payload.token) sessionStorage.setItem('mbs_token', payload.token);
+    if (this.needsMigration) await this.migrateLocalData();
     return true;
   },
 
@@ -92,6 +101,16 @@ const DB = {
 
   cacheAll() {
     Object.keys(this.data).forEach(key => writeLocal(key, this.data[key]));
+  },
+
+  async migrateLocalData() {
+    const keys = ['products', 'heroes', 'settings'];
+    for (const key of keys) {
+      if (Object.prototype.hasOwnProperty.call(this.data, key)) {
+        await this.set(key, this.data[key]);
+      }
+    }
+    this.needsMigration = false;
   },
 
   remove(key) {
@@ -136,6 +155,24 @@ function writeLocal(key, value) {
 function isHostedSite() {
   const host = window.location.hostname;
   return host && host !== 'localhost' && host !== '127.0.0.1';
+}
+
+function localPublicData() {
+  return {
+    products: readLocal('products', null),
+    heroes: readLocal('heroes', null),
+    settings: readLocal('settings', null)
+  };
+}
+
+function hasLocalData(data) {
+  return Boolean(data.products || data.heroes || data.settings);
+}
+
+function samePublicData(a, b) {
+  return JSON.stringify(a.products || []) === JSON.stringify(b.products || [])
+    && JSON.stringify(a.heroes || []) === JSON.stringify(b.heroes || [])
+    && JSON.stringify(a.settings || {}) === JSON.stringify(b.settings || {});
 }
 
 // Seed data
