@@ -4,7 +4,6 @@ const DB_PREFIX = 'mbs_';
 const DB = {
   data: {},
   remote: false,
-  needsMigration: false,
 
   async init() {
     try {
@@ -12,14 +11,7 @@ const DB = {
       if (res.ok) {
         const payload = await res.json();
         if (payload && payload.configured) {
-          const remoteData = payload.data || {};
-          const localData = localPublicData();
-          if (hasLocalData(localData) && !samePublicData(localData, remoteData)) {
-            this.data = { ...remoteData, ...localData };
-            this.needsMigration = true;
-          } else {
-            this.data = remoteData;
-          }
+          this.data = payload.data || {};
           this.remote = true;
           this.cacheAll();
           return;
@@ -44,11 +36,10 @@ const DB = {
   },
 
   async set(key, value) {
-    this.data[key] = value;
-    writeLocal(key, value);
-
     if (!this.remote) {
       if (isHostedSite()) throw new Error('Shared storage is not configured.');
+      this.data[key] = value;
+      writeLocal(key, value);
       return true;
     }
 
@@ -59,6 +50,8 @@ const DB = {
     });
 
     if (!res.ok) throw new Error(await responseMessage(res));
+    this.data[key] = value;
+    writeLocal(key, value);
     return true;
   },
 
@@ -76,7 +69,6 @@ const DB = {
     if (!res.ok) return false;
     const payload = await res.json();
     if (payload.token) sessionStorage.setItem('mbs_token', payload.token);
-    if (this.needsMigration) await this.migrateLocalData();
     return true;
   },
 
@@ -101,16 +93,6 @@ const DB = {
 
   cacheAll() {
     Object.keys(this.data).forEach(key => writeLocal(key, this.data[key]));
-  },
-
-  async migrateLocalData() {
-    const keys = ['products', 'heroes', 'settings'];
-    for (const key of keys) {
-      if (Object.prototype.hasOwnProperty.call(this.data, key)) {
-        await this.set(key, this.data[key]);
-      }
-    }
-    this.needsMigration = false;
   },
 
   remove(key) {
@@ -155,24 +137,6 @@ function writeLocal(key, value) {
 function isHostedSite() {
   const host = window.location.hostname;
   return host && host !== 'localhost' && host !== '127.0.0.1';
-}
-
-function localPublicData() {
-  return {
-    products: readLocal('products', null),
-    heroes: readLocal('heroes', null),
-    settings: readLocal('settings', null)
-  };
-}
-
-function hasLocalData(data) {
-  return Boolean(data.products || data.heroes || data.settings);
-}
-
-function samePublicData(a, b) {
-  return JSON.stringify(a.products || []) === JSON.stringify(b.products || [])
-    && JSON.stringify(a.heroes || []) === JSON.stringify(b.heroes || [])
-    && JSON.stringify(a.settings || {}) === JSON.stringify(b.settings || {});
 }
 
 // Seed data
@@ -220,11 +184,30 @@ function inr(n) { return '₹' + Number(n).toLocaleString('en-IN'); }
 
 function gdImg(url) {
   if (!url) return '';
-  const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  return m ? `https://drive.google.com/uc?export=view&id=${m[1]}` : url;
+  const id = driveFileId(url);
+  return id ? `https://drive.google.com/thumbnail?id=${id}&sz=w1200` : url;
+}
+
+function driveFileId(url) {
+  const patterns = [
+    /\/d\/([a-zA-Z0-9_-]+)/,
+    /[?&]id=([a-zA-Z0-9_-]+)/,
+    /\/folders\/([a-zA-Z0-9_-]+)/
+  ];
+  for (const pattern of patterns) {
+    const match = String(url).match(pattern);
+    if (match) return match[1];
+  }
+  return '';
+}
+
+function cleanWaNumber(number) {
+  const digits = String(number || '').replace(/\D/g, '');
+  if (digits.length === 10) return '91' + digits;
+  return digits;
 }
 
 function waUrl(number, message) {
-  const num = String(number || '').replace(/\D/g, '');
+  const num = cleanWaNumber(number);
   return `https://wa.me/${num}?text=${encodeURIComponent(message)}`;
 }

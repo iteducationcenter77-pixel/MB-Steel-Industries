@@ -30,6 +30,7 @@ const seedData = {
 
 module.exports = async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Cache-Control', 'no-store, max-age=0');
 
   if (!redisConfigured()) {
     return send(res, 200, { configured: false, data: publicData(seedData) });
